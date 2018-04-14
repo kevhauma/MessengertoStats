@@ -1,3 +1,6 @@
+INSTALL NODEJS
+
+
 1. run 'install.bat'
 
 2. please put downloaded chat files into the inputs folder
