@@ -1,0 +1,15 @@
+{
+    "name": "messengertostats",
+    "version": "1.0.0",
+    "description": "gets data out of downloaded facebook data (chat html pages)",
+    "main": "script.js",
+    "scripts": {
+        "test": "echo \"it works\" && exit 1"
+    },
+    "author": "kevin hauman",
+    "license": "ISC",
+    "dependencies": {
+        "cli-progress": "^1.8.0",
+        "readline-sync": "^1.4.9"
+    }
+}
