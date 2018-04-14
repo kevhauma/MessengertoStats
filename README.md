@@ -7,3 +7,8 @@
 4. wait
 
 5. find data in outputs folder
+
+
+
+note: 
+download your own data at: https://www.facebook.com/settings and click 'download a copy of your facebook data' and follow instructions
