@@ -25,8 +25,7 @@ function convertFile(file) {
         if (err) throw err
         let messages = []
         data = data.split('/h3>')[1]
-
-        if (!data.includes('class="message"')) { //when no messages are found
+        if (!data.includes('class="message')) { //when no messages are found
             console.log("empty chat, cannot continue")
 
         } else {
@@ -89,7 +88,7 @@ function convertFile(file) {
             }
             bar.stop();
             const bar2 = new _cliProgress.Bar({
-                format: 'adding: [{bar}] {percentage}%'
+                format: 'perparing: [{bar}] {percentage}%'
             }, _cliProgress.Presets.shades_classic)
             bar2.start(divs.lenght, 0)
 
@@ -133,7 +132,7 @@ function convertFile(file) {
         f++
         if (f < html.length) {
             convertFile(html[f])
-        }
+        } else readlineSync.question('press any key to continue...');
 
     })
 
