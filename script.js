@@ -25,7 +25,7 @@ function convertFile(file) {
         if (err) throw err
         let messages = []
         data = data.split('/h3>')[1]
-
+        //puts spaces before '<' and after '>'
         let nD = ""
         for (let i = 0; i < data.length; i++) {
             if (data[i] === '<') nD += " "
@@ -34,7 +34,7 @@ function convertFile(file) {
         }
         let nnD = ""
         let dataWords = nD.split(" ");
-        for (let i = 0; i < dataWords.length; i++) {
+        for (let i = 0; i < dataWords.length; i++) { //puts newlines after the right html tags
             if (dataWords[i]) {
                 nnD += dataWords[i] + " "
                 if (dataWords[i] === "</p>" ||
@@ -43,7 +43,7 @@ function convertFile(file) {
             }
         }
         data = nnD
-        let divs = data.split('\n')
+        let divs = data.split('\n') //split on newlines
         divs.splice(0, 1)
         divs.splice(divs.length - 1, 1)
 
@@ -55,7 +55,7 @@ function convertFile(file) {
 
 
         //data prep
-        for (let i = divs.length - 1; i >= 0; i--) {
+        for (let i = divs.length - 1; i >= 0; i--) { //backwards because we're removing stuff from the arrays as we go
             let nowhite = ""
             let start = false
             //remove whitelines at start
@@ -208,32 +208,8 @@ function analyze(chat, inp) {
         if (mes.includes("stickers_used")) {
             isImage = true
             let stickerID = mes.split('/')[2].split('.')[0]
-            let foundT = false
-            for (let s = 0; s < total.stickers.length; s++) {
-                if (total.stickers[s].name === stickerID) {
-                    total.stickers[s].count += 1
-                    foundT = true
-                }
-            }
-            if (!foundT) {
-                total.stickers.push({
-                    name: stickerID,
-                    count: 0
-                })
-            }
-            let foundU = false
-            for (let s = 0; s < u.stickers.length; s++) {
-                if (u.stickers[s].name === stickerID) {
-                    u.stickers[s].count += 1
-                    found = true
-                }
-            }
-            if (!foundU) {
-                u.stickers.push({
-                    name: stickerID,
-                    count: 1
-                })
-            }
+            findInArray(total.stickers, stickerID)
+            findInArray(u.stickers, stickerID)
         }
         if (mes.includes("messages/photos") || mes.includes("messages/gifs") || mes.includes("messages/videos") || mes.includes("messages/audio") || mes.includes("messages/file")) {
             u[year].photoShared += 1
@@ -280,7 +256,6 @@ function analyze(chat, inp) {
     total.stickers.sort(sortOnCount)
     total.wordsSaid.sort(sortOnCount)
     total.emojis.sort(sortOnCount)
-
 
     //export to csv
     let stream = fs.createWriteStream("./output/" + inp + ".csv")
@@ -381,7 +356,7 @@ function analyze(chat, inp) {
                 top += total.stickers[t].name + ";" + total.stickers[t].count + ";"
             else top += "; ;"
             if (total.emojis[t])
-                top += +total.emojis[t].name + ";" + total.emojis[t].count + ";\n"
+                top += total.emojis[t].name + ";" + total.emojis[t].count + ";"
             else top += "; ;"
             top += ";\n"
         }
@@ -496,14 +471,10 @@ function sortOnCount(a, b) {
 }
 
 function findInArray(array, word) {
-    let found = false
-    for (let i = 0; i < array.length; i++) {
-        if (array[i].name === word) {
-            array[i].count += 1
-            found = true
-        }
-    }
-    if (!found) {
+    let found = array.find(x => x.name === word)
+
+    if (found) found.count += 1
+    else {
         array.push({
             name: word,
             count: 1
