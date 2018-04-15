@@ -11,7 +11,9 @@ fs.readdir("./input/", (err, files) => {
     for (let t = 0; t < files.length; t++) {
         if (files[t].endsWith('.html')) html.push(files[t])
     }
-    convertFile(html[f])
+    if (html.length > 0)
+        convertFile(html[f])
+    else console.log("no files found")
 })
 
 
