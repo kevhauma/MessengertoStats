@@ -88,7 +88,7 @@ function convertFile(file) {
             }
             bar.stop();
             const bar2 = new _cliProgress.Bar({
-                format: 'perparing: [{bar}] {percentage}%'
+                format: 'preparing: [{bar}] {percentage}%'
             }, _cliProgress.Presets.shades_classic)
             bar2.start(divs.lenght, 0)
 
