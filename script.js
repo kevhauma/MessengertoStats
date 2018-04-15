@@ -28,113 +28,115 @@ function convertFile(file) {
 
         if (!data.includes('class="message"')) { //when no messages are found
             console.log("empty chat, cannot continue")
-            return
-        }
 
+        } else {
 
-        //puts spaces before '<' and after '>'
-        let nD = ""
-        for (let i = 0; i < data.length; i++) {
-            if (data[i] === '<') nD += " "
-            nD += data[i]
-            if (data[i] === '>') nD += " "
-        }
-        let nnD = ""
-        let dataWords = nD.split(" ");
-        for (let i = 0; i < dataWords.length; i++) { //puts newlines after the right html tags
-            if (dataWords[i]) {
-                nnD += dataWords[i] + " "
-                if (dataWords[i] === "</p>" ||
-                    dataWords[i] === "</div>" ||
-                    dataWords[i] === 'class="message">') nnD += "\n"
+            //puts spaces before '<' and after '>'
+            let nD = ""
+            for (let i = 0; i < data.length; i++) {
+                if (data[i] === '<') nD += " "
+                nD += data[i]
+                if (data[i] === '>') nD += " "
             }
-        }
-        data = nnD
-        let divs = data.split('\n') //split on newlines
-        divs.splice(0, 1)
-        divs.splice(divs.length - 1, 1)
-
-        //start progress bar
-        const bar = new _cliProgress.Bar({
-            format: 'converting: [{bar}] {percentage}%'
-        }, _cliProgress.Presets.shades_classic)
-        bar.start(divs.lenght, 0)
-
-
-        //data prep
-        for (let i = divs.length - 1; i >= 0; i--) { //backwards because we're removing stuff from the arrays as we go
-            let nowhite = ""
-            let start = false
-            //remove whitelines at start
-            for (let j = 0; j < divs[i].length; j++) {
-                if (divs[i][j] != " ") {
-                    start = true
+            let nnD = ""
+            let dataWords = nD.split(" ");
+            for (let i = 0; i < dataWords.length; i++) { //puts newlines after the right html tags
+                if (dataWords[i]) {
+                    nnD += dataWords[i] + " "
+                    if (dataWords[i] === "</p>" ||
+                        dataWords[i] === "</div>" ||
+                        dataWords[i] === 'class="message">') nnD += "\n"
                 }
-                if (start) nowhite += divs[i][j]
             }
-            divs[i] = nowhite
-            //remove excess divs
-            divs[i] = divs[i].replace('\r', '')
-            divs[i] = divs[i].replace('<div class="message_header">', '')
-            divs[i] = divs[i].replace('<span class="meta">', '')
-            divs[i] = divs[i].replace('<span class="user">', '')
-            //remove 'empty' lines
-            if (divs[i].includes('class="message"') || divs[i] === '</div> ' || divs[i] === '<p>' || divs[i] === '</p>') {
-                divs.splice(i, 1)
-            }
+            data = nnD
+            let divs = data.split('\n') //split on newlines
+            divs.splice(0, 1)
+            divs.splice(divs.length - 1, 1)
 
-            //update progress bar
-            let p = Math.round((1 - (i / divs.length)) * 100)
-            bar.update(p)
+            //start progress bar
+            const bar = new _cliProgress.Bar({
+                format: 'converting: [{bar}] {percentage}%'
+            }, _cliProgress.Presets.shades_classic)
+            bar.start(divs.lenght, 0)
 
-        }
-        bar.stop();
-        const bar2 = new _cliProgress.Bar({
-            format: 'adding: [{bar}] {percentage}%'
-        }, _cliProgress.Presets.shades_classic)
-        bar2.start(divs.lenght, 0)
 
-        let msg = {}
-        //put lines of data into useful objects
-        for (let i = 0; i < divs.length; i++) {
-            let p = Math.round((i / divs.length) * 100)
-            bar2.update(p)
-
-            if (divs[i].endsWith('</div> ')) { //if data line
-                let parts = divs[i].split("</span>") //split on span tag
-                parts[0] = parts[0].replace(/ /g, "")
-                if (parts[0].toLowerCase().includes(ownerName)) msg.user = 'me'
-                else msg.user = parts[0]
-                let datetime = parts[1].split(',')[1].split('at')
-                let date = datetime[0].split(' ')
-                let time = datetime[1].split(' ')[1].split(':')
-                let day = parseInt(date[1])
-                let month = monthToNumber(date[2])
-                let year = parseInt(date[3])
-                let hours = parseInt(time[0])
-                let minutes = parseInt(time[1])
-
-                let newDate = new Date(year, month, day, hours, minutes, 0, 0)
-                msg.time = newDate.toJSON()
-            }
-            if (divs[i].endsWith('</p> ')) { //if message line
-                let mes = divs[i].replace('</p>', '').replace(/<p>/g, '') //remove tags
-                let nospace = mes.replace(/ /g, '')
-                if (nospace) {
-                    msg.message = mes
-                    messages.push(msg)
+            //data prep
+            for (let i = divs.length - 1; i >= 0; i--) { //backwards because we're removing stuff from the arrays as we go
+                let nowhite = ""
+                let start = false
+                //remove whitelines at start
+                for (let j = 0; j < divs[i].length; j++) {
+                    if (divs[i][j] != " ") {
+                        start = true
+                    }
+                    if (start) nowhite += divs[i][j]
                 }
-                msg = {}
-            }
+                divs[i] = nowhite
+                //remove excess divs
+                divs[i] = divs[i].replace('\r', '')
+                divs[i] = divs[i].replace('<div class="message_header">', '')
+                divs[i] = divs[i].replace('<span class="meta">', '')
+                divs[i] = divs[i].replace('<span class="user">', '')
+                //remove 'empty' lines
+                if (divs[i].includes('class="message"') || divs[i] === '</div> ' || divs[i] === '<p>' || divs[i] === '</p>') {
+                    divs.splice(i, 1)
+                }
 
+                //update progress bar
+                let p = Math.round((1 - (i / divs.length)) * 100)
+                bar.update(p)
+
+            }
+            bar.stop();
+            const bar2 = new _cliProgress.Bar({
+                format: 'adding: [{bar}] {percentage}%'
+            }, _cliProgress.Presets.shades_classic)
+            bar2.start(divs.lenght, 0)
+
+            let msg = {}
+            //put lines of data into useful objects
+            for (let i = 0; i < divs.length; i++) {
+                let p = Math.round((i / divs.length) * 100)
+                bar2.update(p)
+
+                if (divs[i].endsWith('</div> ')) { //if data line
+                    let parts = divs[i].split("</span>") //split on span tag
+                    parts[0] = parts[0].replace(/ /g, "")
+                    if (parts[0].toLowerCase().includes(ownerName)) msg.user = 'me'
+                    else msg.user = parts[0]
+                    let datetime = parts[1].split(',')[1].split('at')
+                    let date = datetime[0].split(' ')
+                    let time = datetime[1].split(' ')[1].split(':')
+                    let day = parseInt(date[1])
+                    let month = monthToNumber(date[2])
+                    let year = parseInt(date[3])
+                    let hours = parseInt(time[0])
+                    let minutes = parseInt(time[1])
+
+                    let newDate = new Date(year, month, day, hours, minutes, 0, 0)
+                    msg.time = newDate.toJSON()
+                }
+                if (divs[i].endsWith('</p> ')) { //if message line
+                    let mes = divs[i].replace('</p>', '').replace(/<p>/g, '') //remove tags
+                    let nospace = mes.replace(/ /g, '')
+                    if (nospace) {
+                        msg.message = mes
+                        messages.push(msg)
+                    }
+                    msg = {}
+                }
+
+            }
+            bar2.stop()
+            analyze(messages, inp)
         }
-        bar2.stop()
-        analyze(messages, inp)
         f++
         if (f < html.length) {
             convertFile(html[f])
         }
+
     })
+
 }
 
 
