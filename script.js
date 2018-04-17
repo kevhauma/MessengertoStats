@@ -315,7 +315,7 @@ function analyze(chat, inp) {
         stream.write(header + ";\n" + wordsLine + ";\n" + messagesLine + ";\n" + picturesLine + ";\n" + stickersUsed + ";\n")
 
         //headers
-        stream.write("users; ;per day;   ;   ;    ;   ;   ;   ; ;per month;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ; ;per hour; ; ; ; ; ; ; ; ; ; ; ; ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ; photos shared;words;messages \n");
+        stream.write("users; ;per day;   ;   ;    ;   ;   ;   ; ;per month;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ; ;per hour; ; ; ; ; ; ; ; ; ; ; ; ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;\n");
         stream.write("     ; ;mon    ;tue;wed;thur;fri;sat;sun; ;jan      ;feb;mar;apr;may;jun;jul;aug;sep;oct;nov;dec; ;0       ;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23\n");
         for (let y = 2004; y <= new Date().getFullYear(); y++) {
             let year = false;
@@ -343,7 +343,6 @@ function analyze(chat, inp) {
                         if (!number) number = 0
                         line += number + ";"
                     }
-                    line += ";" + us[y].photoShared + ";" + us[y].wordCount + ";" + us[y].messageCount + ";"
                     yearPart += (line + "\n")
                 }
 
