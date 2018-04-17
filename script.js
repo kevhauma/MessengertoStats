@@ -29,7 +29,7 @@ function convertFile(file) {
             console.log("empty chat, cannot continue")
 
         } else {
-
+            data = data.replace("\n", "").replace("\r", "")
             //puts spaces before '<' and after '>'
             let nD = ""
             for (let i = 0; i < data.length; i++) {
@@ -61,7 +61,7 @@ function convertFile(file) {
 
             //data prep
             for (let i = divs.length - 1; i >= 0; i--) { //backwards because we're removing stuff from the arrays as we go
-                
+
                 divs[i] = divs[i].trim()
                 //remove excess divs
                 divs[i] = divs[i].replace('\r', '')
@@ -69,7 +69,7 @@ function convertFile(file) {
                 divs[i] = divs[i].replace('<span class="meta">', '')
                 divs[i] = divs[i].replace('<span class="user">', '')
                 //remove 'empty' lines
-                if (divs[i].includes('class="message"') || divs[i] === '</div> ' || divs[i] === '<p>' || divs[i] === '</p>') {
+                if (divs[i].includes('class="message"') || divs[i] === '</div>' || divs[i] === '<p>' || divs[i] === '</p>') {
                     divs.splice(i, 1)
                 }
 
@@ -89,25 +89,47 @@ function convertFile(file) {
             for (let i = 0; i < divs.length; i++) {
                 let p = Math.round((i / divs.length) * 100)
                 bar2.update(p)
+                if (divs[i].endsWith('</div>')) { //if data line
 
-                if (divs[i].endsWith('</div> ')) { //if data line
                     let parts = divs[i].split("</span>") //split on span tag
                     parts[0] = parts[0].replace(/ /g, "")
                     if (parts[0].toLowerCase().includes(ownerName)) msg.user = 'me'
                     else msg.user = parts[0]
-                    let datetime = parts[1].split(',')[1].split('at')
+                    let preDT = parts[1].split(',')
+                    let datetime
+                    if (preDT.length > 2) 
+                        datetime = (preDT[1] + ""+preDT[2]).split('at')
+                    else
+                        datetime =preDT[1].split('at')
                     let date = datetime[0].split(' ')
                     let time = datetime[1].split(' ')[1].split(':')
-                    let day = parseInt(date[1])
-                    let month = monthToNumber(date[2])
-                    let year = parseInt(date[3])
-                    let hours = parseInt(time[0])
-                    let minutes = parseInt(time[1])
 
-                    let newDate = new Date(year, month, day, hours, minutes, 0, 0)
+                    let newDate;
+                    if (isNaN(date[2])) { //second part is month (D.M.Y format)
+                        let day = parseInt(date[1])
+                        let month = monthToNumber(date[2])
+                        let year = parseInt(date[3])
+                        let hours = parseInt(time[0])
+                        let minutes = parseInt(time[1])
+                        newDate = new Date(year, month, day, hours, minutes, 0, 0)
+                    } else { //other format (for M.D.Y also am-pm)                      
+                        let month = monthToNumber(date[1])
+                        let day = parseInt(date[2])
+                        let year = parseInt(date[3])
+                        let hs, mins
+                        hs = parseInt(time[0])
+                        if (time[1].toLowerCase().includes('pm')) {
+                            hs += 12
+                            if (hs > 23) hs = 0
+                        }
+                        mins = parseInt(time[1].substr(0, 2))
+                        let hours = hs
+                        let minutes = parseInt(time[1])
+                        newDate = new Date(year, month, day, hours, minutes, 0, 0)
+                    }
                     msg.time = newDate.toJSON()
                 }
-                if (divs[i].endsWith('</p> ')) { //if message line
+                if (divs[i].endsWith('</p>')) { //if message line
                     let mes = divs[i].replace('</p>', '').replace(/<p>/g, '') //remove tags
                     let nospace = mes.replace(/ /g, '')
                     if (nospace) {
@@ -390,49 +412,49 @@ function analyze(chat, inp) {
 
 //helper functions
 function monthToNumber(month) {
-    switch (month.toLowerCase()) {
-        case 'january':
+    switch (month.toLowerCase().substr(0,3)) {
+        case 'jan':
+            return 0
+        case 'feb':
             return 1
-        case 'february':
+        case 'mar':
             return 2
-        case 'march':
+        case 'apr':
             return 3
-        case 'april':
-            return 4
         case 'may':
+            return 4
+        case 'jun':
             return 5
-        case 'june':
+        case 'jul':
             return 6
-        case 'july':
+        case 'aug':
             return 7
-        case 'august':
+        case 'sep':
             return 8
-        case 'september':
+        case 'oct':
             return 9
-        case 'october':
+        case 'nov':
             return 10
-        case 'november':
+        case 'dec':
             return 11
-        case 'december':
-            return 12
     }
 }
 
 function getDaybyNumber(day) {
     switch (day) {
-        case 0:
-            return 'mon'
         case 1:
-            return 'tue'
+            return 'mon'
         case 2:
-            return 'wed'
+            return 'tue'
         case 3:
-            return 'thur'
+            return 'wed'
         case 4:
-            return 'fri'
+            return 'thur'
         case 5:
-            return 'sat'
+            return 'fri'
         case 6:
+            return 'sat'
+        case 0:
             return 'sun'
     }
 }
