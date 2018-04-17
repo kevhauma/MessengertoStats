@@ -2,6 +2,7 @@ let fs = require('fs')
 const _cliProgress = require('cli-progress')
 const readlineSync = require('readline-sync');
 let emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug
+let monthsArray = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
 let html = []
 let f = 0
 
@@ -95,39 +96,43 @@ function convertFile(file) {
                     parts[0] = parts[0].replace(/ /g, "")
                     if (parts[0].toLowerCase().includes(ownerName)) msg.user = 'me'
                     else msg.user = parts[0]
-                    let preDT = parts[1].split(',')
-                    let datetime
-                    if (preDT.length > 2) 
-                        datetime = (preDT[1] + ""+preDT[2]).split('at')
-                    else
-                        datetime =preDT[1].split('at')
-                    let date = datetime[0].split(' ')
-                    let time = datetime[1].split(' ')[1].split(':')
+                    let dateTimeStr = parts[1].trim()
 
-                    let newDate;
-                    if (isNaN(date[2])) { //second part is month (D.M.Y format)
-                        let day = parseInt(date[1])
-                        let month = monthToNumber(date[2])
-                        let year = parseInt(date[3])
-                        let hours = parseInt(time[0])
-                        let minutes = parseInt(time[1])
-                        newDate = new Date(year, month, day, hours, minutes, 0, 0)
-                    } else { //other format (for M.D.Y also am-pm)                      
-                        let month = monthToNumber(date[1])
-                        let day = parseInt(date[2])
-                        let year = parseInt(date[3])
-                        let hs, mins
-                        hs = parseInt(time[0])
-                        if (time[1].toLowerCase().includes('pm')) {
-                            hs += 12
-                            if (hs > 23) hs = 0
+                    let day = 0
+                    let month = searchMonthInString(dateTimeStr)
+                    let year = 0,
+                        hours = 0,
+                        minutes = 0
+
+                    let dateparts = dateTimeStr.replace(/[-\/.,]/g, " ").split(' ')
+                    for (let t = 0; t < dateparts.length; t++) {
+                        if (dateparts[t]) {
+                            if (dateparts[t].match(/^[0-9]{1,2}/)) { //if starts with 2 numbers
+                                let onlyNumber = dateparts[t].replace(/[^0-9.]/g, ""); //remove all but numbers
+                                if (onlyNumber.length <= 2 && parseInt(onlyNumber) && parseInt(onlyNumber) < 32) //only 2 or less chars, IS something and is less than 32
+                                    day = parseInt(onlyNumber)
+                            }
+                            let potTime = dateparts[t].split(':') //potential time
+                            if (potTime.length > 1) {
+                                hours = parseInt(potTime[0])
+                                minutes = parseInt(potTime[1])
+                            }
+                            if (dateparts[t].match(/^[0-9]{4}/) && parseInt(dateparts[t]) >= 2004) { //has for numbers and is greater than 2004
+                                year = parseInt(dateparts[t])
+                            }
                         }
-                        mins = parseInt(time[1].substr(0, 2))
-                        let hours = hs
-                        let minutes = parseInt(time[1])
-                        newDate = new Date(year, month, day, hours, minutes, 0, 0)
                     }
+                    if (dateTimeStr.toLowerCase().includes('pm')) {
+                        hours += 12
+                        if (hours > 23) hours = 12
+                    } else if (dateTimeStr.toLowerCase().includes('am') && hours == 12) {
+                        hours = 0
+                    }
+
+                    let newDate = new Date(year, month, day, hours, minutes, 0, 0)
+
                     msg.time = newDate.toJSON()
+
                 }
                 if (divs[i].endsWith('</p>')) { //if message line
                     let mes = divs[i].replace('</p>', '').replace(/<p>/g, '') //remove tags
@@ -201,7 +206,7 @@ function analyze(chat, inp) {
         u.byHour[hour] += 1
 
 
-        //add byDay    
+        //add byDay
         let day = getDaybyNumber(time.getDay())
 
         if (!u[year].byDay[day])
@@ -313,9 +318,11 @@ function analyze(chat, inp) {
         stream.write("users; ;per day;   ;   ;    ;   ;   ;   ; ;per month;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ; ;per hour; ; ; ; ; ; ; ; ; ; ; ; ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ; photos shared;words;messages \n");
         stream.write("     ; ;mon    ;tue;wed;thur;fri;sat;sun; ;jan      ;feb;mar;apr;may;jun;jul;aug;sep;oct;nov;dec; ;0       ;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23\n");
         for (let y = 2004; y <= new Date().getFullYear(); y++) {
-            if (users[0][y]) {
-                stream.write(y + ";\n")
-                for (let u = 0; u < users.length; u++) {
+            let year = false;
+            let yearPart = "";
+            for (let u = 0; u < users.length; u++) {
+                if (users[u][y]) {
+                    year = true;
                     let us = users[u]
                     let line = us.name + "; ;"
 
@@ -337,10 +344,12 @@ function analyze(chat, inp) {
                         line += number + ";"
                     }
                     line += ";" + us[y].photoShared + ";" + us[y].wordCount + ";" + us[y].messageCount + ";"
-                    stream.write(line + "\n")
+                    yearPart += (line + "\n")
                 }
-                stream.write(";\n")
+
             }
+            if (year)
+                stream.write(y + ";\n" + yearPart + "\n")
         }
         stream.write("all time;\n")
         for (let u = 0; u < users.length; u++) {
@@ -410,9 +419,17 @@ function analyze(chat, inp) {
     }
 }
 
+function searchMonthInString(string) {
+    string = string.toLowerCase()
+    for (let i = 0; i < monthsArray.length; i++) {
+        if (string.includes(monthsArray[i])) return i
+    }
+}
+
+
 //helper functions
 function monthToNumber(month) {
-    switch (month.toLowerCase().substr(0,3)) {
+    switch (month.toLowerCase().substr(0, 3)) {
         case 'jan':
             return 0
         case 'feb':
