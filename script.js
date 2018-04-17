@@ -61,16 +61,8 @@ function convertFile(file) {
 
             //data prep
             for (let i = divs.length - 1; i >= 0; i--) { //backwards because we're removing stuff from the arrays as we go
-                let nowhite = ""
-                let start = false
-                //remove whitelines at start
-                for (let j = 0; j < divs[i].length; j++) {
-                    if (divs[i][j] != " ") {
-                        start = true
-                    }
-                    if (start) nowhite += divs[i][j]
-                }
-                divs[i] = nowhite
+                
+                divs[i] = divs[i].trim()
                 //remove excess divs
                 divs[i] = divs[i].replace('\r', '')
                 divs[i] = divs[i].replace('<div class="message_header">', '')
