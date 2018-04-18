@@ -2,10 +2,19 @@ let fs = require('fs')
 const _cliProgress = require('cli-progress')
 const readlineSync = require('readline-sync');
 let emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug
-let monthsArray = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
+let monthsArray // = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
 let html = []
 let f = 0
 
+fs.readFile('./months.txt', 'utf8', function (err, data) {
+    monthsArray = data.split(",")
+    for (let i = 0; i < monthsArray.length; i++)
+        monthsArray[i] = monthsArray[i].toLowerCase().trim()
+})
+
+
+
+console.log("if you crash on an invalid month, please change the month.txt to the appropriate language")
 let ownerName = readlineSync.question('What is your facebook name? (for analyzing purposes)');
 ownerName = ownerName.toLowerCase().replace(/ /g, '');
 fs.readdir("./input/", (err, files) => {
@@ -128,7 +137,6 @@ function convertFile(file) {
                     } else if (dateTimeStr.toLowerCase().includes('am') && hours == 12) {
                         hours = 0
                     }
-
                     let newDate = new Date(year, month, day, hours, minutes, 0, 0)
 
                     msg.time = newDate.toJSON()
@@ -316,7 +324,11 @@ function analyze(chat, inp) {
 
         //headers
         stream.write("users; ;per day;   ;   ;    ;   ;   ;   ; ;per month;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ; ;per hour; ; ; ; ; ; ; ; ; ; ; ; ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;  ;\n");
-        stream.write("     ; ;mon    ;tue;wed;thur;fri;sat;sun; ;jan      ;feb;mar;apr;may;jun;jul;aug;sep;oct;nov;dec; ;0       ;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23\n");
+        let daysmonthsLine = "     ; ;mon    ;tue;wed;thur;fri;sat;sun; ;"
+        for (let m = 0; m < monthsArray.length; m++)
+            daysmonthsLine += monthsArray[m] + ";"
+        daysmonthsLine += "; 0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 23 \n "
+        stream.write(daysmonthsLine)
         for (let y = 2004; y <= new Date().getFullYear(); y++) {
             let year = false;
             let yearPart = "";
@@ -428,31 +440,8 @@ function searchMonthInString(string) {
 
 //helper functions
 function monthToNumber(month) {
-    switch (month.toLowerCase().substr(0, 3)) {
-        case 'jan':
-            return 0
-        case 'feb':
-            return 1
-        case 'mar':
-            return 2
-        case 'apr':
-            return 3
-        case 'may':
-            return 4
-        case 'jun':
-            return 5
-        case 'jul':
-            return 6
-        case 'aug':
-            return 7
-        case 'sep':
-            return 8
-        case 'oct':
-            return 9
-        case 'nov':
-            return 10
-        case 'dec':
-            return 11
+    for (let i = 0; i < monthsArray.length; i++) {
+        if (monthsArray[i] === month) return i
     }
 }
 
@@ -476,32 +465,7 @@ function getDaybyNumber(day) {
 }
 
 function getMonthbyNumber(month) {
-    switch (month) {
-        case 0:
-            return 'jan'
-        case 1:
-            return 'feb'
-        case 2:
-            return 'mar'
-        case 3:
-            return 'apr'
-        case 4:
-            return 'may'
-        case 5:
-            return 'jun'
-        case 6:
-            return 'jul'
-        case 7:
-            return 'aug'
-        case 8:
-            return 'sep'
-        case 9:
-            return 'oct'
-        case 10:
-            return 'nov'
-        case 11:
-            return 'dec'
-    }
+    return monthsArray[month]
 }
 
 function sortOnCount(a, b) {
