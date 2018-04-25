@@ -17,4 +17,5 @@ example graphs
 ![example graphs](https://i.imgur.com/lBbI5Im.png)
 
 note: 
-download your own data at: https://www.facebook.com/settings and click 'download a copy of your facebook data' and follow instructions
+1. download your own data at: https://www.facebook.com/settings and click 'download a copy of your facebook data' and follow instructions
+2. they recently gave the option to download JSON, will try to release for json
