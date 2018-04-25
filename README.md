@@ -1,15 +1,14 @@
-INSTALL NODEJS
+1. [install node.js](https://nodejs.org/)
 
+2. run 'install.bat'
 
-1. run 'install.bat'
+3. please put downloaded chat files into the inputs folder
 
-2. please put downloaded chat files into the inputs folder
+4. run 'run.bat'
 
-3. run 'run.bat'
+5. wait
 
-4. wait
-
-5. find data in outputs folder
+6. find data in outputs folder
 
 
 legend of data generate
