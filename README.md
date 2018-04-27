@@ -1,15 +1,14 @@
-INSTALL NODEJS
+1. [install node.js](https://nodejs.org/)
 
+2. run 'install.bat'
 
-1. run 'install.bat'
+3. please put downloaded chat files into the inputs folder
 
-2. please put downloaded chat files into the inputs folder
+4. run 'run.bat'
 
-3. run 'run.bat'
+5. wait
 
-4. wait
-
-5. find data in outputs folder
+6. find data in outputs folder
 
 
 legend of data generate
@@ -18,4 +17,5 @@ example graphs
 ![example graphs](https://i.imgur.com/lBbI5Im.png)
 
 note: 
-download your own data at: https://www.facebook.com/settings and click 'download a copy of your facebook data' and follow instructions
+1. download your own data at: https://www.facebook.com/settings and click 'download a copy of your facebook data' and follow instructions
+2. they recently gave the option to download JSON, will try to release for json
