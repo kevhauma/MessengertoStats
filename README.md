@@ -12,7 +12,7 @@
 
 
 legend of data generate
-![legend of data generate](https://i.imgur.com/Q3JvRc3.png)
+![legend of data generate](https://i.imgur.com/40OQ63V.png)
 example graphs
 ![example graphs](https://i.imgur.com/lBbI5Im.png)
 
