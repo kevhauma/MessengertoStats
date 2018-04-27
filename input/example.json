@@ -1,0 +1,36 @@
+{
+    "messages": [
+        {
+            "sender_name": "random person",
+            "timestamp": 1410458414,
+            "content": "last message",
+            "type": "Generic"
+    },
+        {
+            "sender_name": "other person",
+            "timestamp": 1410458378,
+            "content": "oh man, a third message",
+            "type": "Generic"
+    },
+        {
+            "sender_name": "random person",
+            "timestamp": 1410458318,
+            "content": "two messages? are you crazy?",
+            "type": "Generic"
+    },
+        {
+            "sender_name": "other person",
+            "timestamp": 1410458274,
+            "content": "cool first message",
+            "type": "Generic"
+    }
+  ],
+    "title": "other person",
+    "is_still_participant": true,
+    "status": "Pending",
+    "thread_type": "Regular",
+    "participants": [
+    "other person"
+  ],
+    "thread_path": "OtherPerson_d9423d5227"
+}
