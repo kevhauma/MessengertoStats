@@ -2,7 +2,7 @@
 
 2. run 'install.bat'
 
-3. please put downloaded chat files into the inputs folder
+3. please put downloaded chat JSON files into the inputs folder
 
 4. run 'run.bat'
 
@@ -17,5 +17,5 @@ example graphs
 ![example graphs](https://i.imgur.com/lBbI5Im.png)
 
 note: 
-1. download your own data at: https://www.facebook.com/settings and click 'download a copy of your facebook data' and follow instructions
-2. they recently gave the option to download JSON, will try to release for json
+1. download your own data at: https://www.facebook.com/settings and click 'download a copy of your facebook data' and select 'JSON' instead of HTML as data type
+
