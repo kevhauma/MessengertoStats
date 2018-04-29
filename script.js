@@ -7,8 +7,6 @@ let daysArray = ["mon", "tue", "wed", "thur", "fri", "sat", "sun"]
 let json = []
 let f = 0
 
-console.log("if you crash on an invalid month, please change the month.txt to the appropriate language")
-
 fs.readdir("./input/", (err, files) => {
     for (let t = 0; t < files.length; t++) {
         if (files[t].endsWith('.json')) json.push(files[t])
@@ -143,6 +141,8 @@ function analyze(chat, inp, isJSON) {
         bar.update(p)
     }
     bar.stop()
+
+
 
     let firstMesDate = new Date(chat[0].timestamp)
     let lastMesDate = new Date(chat[chat.length - 1].timestamp)
