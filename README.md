@@ -10,6 +10,8 @@
 
 6. find data in outputs folder
 
+7. Open with excel (or similar) and create graphs
+
 
 legend of data generate
 ![legend of data generate](https://i.imgur.com/40OQ63V.png)
