@@ -32,7 +32,7 @@ function convertFile(file) {
     f++
     if (f < json.length) {
         convertFile(json[f])
-    } else exit()
+    }
 
 }
 
@@ -53,10 +53,10 @@ function analyze(chat, inp, isJSON) {
         format: 'analyzing data: [{bar}] {percentage}%'
     }, _cliProgress.Presets.shades_classic)
     bar.start(chat.lenght, 0)
-    chat.reverse()
-
-
-
+    //sort chronological
+    chat.sort((a, b) => {
+        return a.timestamp > b.timestamp ? 1 : -1
+    })
 
     //go through every message and add data
     for (let i = 0; i < chat.length; i++) {
@@ -64,7 +64,6 @@ function analyze(chat, inp, isJSON) {
         chat[i].timestamp *= 1000
         let time = new Date(chat[i].timestamp)
         let year = time.getFullYear()
-
         //add to messagecount
         total.messageCount += 1
         u.messageCount += 1
@@ -153,9 +152,9 @@ function analyze(chat, inp, isJSON) {
     tomorrow.setDate(tomorrow.getDate() + 1)
     let millisInDay = tomorrow.getTime() - today
     firstMesDate = new Date(firstMesDate.getFullYear(), firstMesDate.getMonth(), firstMesDate.getDate(), 2, 0, 1, 0)
-
     for (let i = firstMesDate.getTime(); i < lastMesDate.getTime(); i += millisInDay) {
         let thisDay = new Date(i)
+
         //obj from array of this day
         let mesObj = mesPerPersonPerDayPerYear.find(x => x.date == thisDay.getTime())
         if (!mesObj) {
@@ -296,6 +295,7 @@ function analyze(chat, inp, isJSON) {
 
 
         stream.end()
+
     })
     console.log("Finished! find the data at /output/" + inp + ".csv")
 
@@ -336,9 +336,7 @@ function monthToNumber(month) {
     }
 }
 
-function exit() {
-    readlineSync.question('press any key to continue...');
-}
+
 
 function getDaybyNumber(day) {
     return monthsArray[day]
